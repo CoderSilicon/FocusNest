@@ -1,20 +1,18 @@
 <template>
-  <div id="app">
-    <h1>Welcome to Vue!</h1>
-    <p>This is a basic Vue template.</p>
+  <div id="app" class="bg-[#0b0b0b] h-screen">
+    <AppNavbar />
+    <AppPomodoro />
   </div>
 </template>
-
-<style scoped>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  text-align: center;
-  margin-top: 60px;
-}
-</style>
 
 <script lang="ts">
 export default {
   name: 'App',
+  components: {
+    AppNavbar,
+    AppPomodoro,
+  },
 }
+import AppNavbar from './components/App_Navbar.vue'
+import AppPomodoro from './components/App_Pomodoro.vue'
 </script>
