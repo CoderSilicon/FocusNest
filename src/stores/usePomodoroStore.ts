@@ -10,7 +10,6 @@ interface PomodoroSettings {
   autoStartBreaks: boolean
   autoStartPomodoros: boolean
   notifications: boolean
-  soundEffects: boolean
 }
 
 interface Task {
@@ -37,13 +36,6 @@ interface SavedData {
   completedSessions?: Array<Omit<PomodoroSession, 'completedAt'> & { completedAt: string }>
   pomodoroCount?: number
   activeTaskId?: string | null
-}
-
-// Extend Window interface for webkit audio context
-declare global {
-  interface Window {
-    webkitAudioContext?: typeof AudioContext
-  }
 }
 
 export const usePomodoroStore = defineStore('pomodoro', {
@@ -139,7 +131,6 @@ export const usePomodoroStore = defineStore('pomodoro', {
         autoStartBreaks: false,
         autoStartPomodoros: false,
         notifications: true,
-        soundEffects: true,
       }
       this.saveToLocalStorage()
     },
@@ -226,11 +217,6 @@ export const usePomodoroStore = defineStore('pomodoro', {
         this.showNotification()
       }
 
-      // Play sound
-      if (this.settings.soundEffects) {
-        this.playCompletionSound()
-      }
-
       this.currentSession = null
       this.saveToLocalStorage()
     },
@@ -290,40 +276,6 @@ export const usePomodoroStore = defineStore('pomodoro', {
             new Notification(title, { body, icon: '/favicon.ico' })
           }
         })
-      }
-    },
-
-    async playCompletionSound() {
-      try {
-        // Use proper AudioContext typing
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext
-        if (!AudioContextClass) {
-          console.warn('AudioContext not supported')
-          return
-        }
-
-        const audioContext = new AudioContextClass()
-        const oscillator = audioContext.createOscillator()
-        const gainNode = audioContext.createGain()
-
-        oscillator.connect(gainNode)
-        gainNode.connect(audioContext.destination)
-
-        oscillator.frequency.value = 800
-        oscillator.type = 'sine'
-
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5)
-
-        oscillator.start(audioContext.currentTime)
-        oscillator.stop(audioContext.currentTime + 0.5)
-
-        // Clean up
-        setTimeout(() => {
-          audioContext.close()
-        }, 1000)
-      } catch (error) {
-        console.error('Error playing completion sound:', error)
       }
     },
 

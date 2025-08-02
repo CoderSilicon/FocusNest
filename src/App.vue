@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="bg-[#0b0b0b] h-screen">
+  <div id="app" class="bg-zinc-950 h-screen">
     <AppNavbar />
     <AppPomodoro />
   </div>
