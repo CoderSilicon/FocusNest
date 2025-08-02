@@ -1,10 +1,10 @@
 <template>
   <div
-    class="lexend rounded-4xl mx-18 p-9 transition-all duration-500 select-none"
+    class="lexend rounded-4xl mx-auto p-9 transition-all duration-500 select-none max-w-4xl backdrop-blur-3xl shadow-lg"
     :class="{
-      'bg-gradient-to-r from-zinc-950 via-zinc-900 to-zinc-950 ': mode === 'pomodoro',
-      'bg-gradient-to-r from-zinc-950 via-green-600 to-zinc-950': mode === 'short',
-      'bg-gradient-to-r from-zinc-950 via-emerald-600 to-zinc-950': mode === 'long',
+      'bg-zinc-300/50': mode === 'pomodoro',
+      'bg-zinc-400/50': mode === 'short',
+      'bg-zinc-600/50': mode === 'long',
     }"
   >
     <!-- Mode Navigation -->
@@ -42,16 +42,23 @@
 
         <!-- Progress Bar -->
         <div class="w-full max-w-md mx-auto mb-6">
-          <div class="w-full h-2 rounded-full bg-white">
+          <div
+            class="w-full h-2 rounded-full overflow-hidden"
+            :class="{
+              'bg-zinc-300/50': mode === 'pomodoro',
+              'bg-zinc-400/50': mode === 'short',
+              'bg-zinc-600/50': mode === 'long',
+            }"
+          >
             <div
-              class="h-full rounded-full transition-all duration-1000 ease-linear bg-black"
+              class="h-full rounded-full transition-all duration-1000 ease-linear bg-slate-100"
               :style="{ width: progressPercentage + '%' }"
             ></div>
           </div>
         </div>
 
         <!-- Session Info -->
-        <div class="text-lg font-medium mb-6 text-slate-300">
+        <div class="text-lg font-medium mb-6 text-slate-100">
           <p v-if="mode === 'pomodoro'">
             Pomodoro #{{ store.pomodoroCount + 1 }}
             <span v-if="store.isLongBreakTime"> • Long break next!</span>
@@ -102,14 +109,17 @@
       <div class="flex justify-center items-center gap-4">
         <button
           @click="toggle"
-          class="px-8 py-3 rounded-full font-bold text-lg transition-all duration-300 border-2 min-w-[120px] bg-white text-black"
+          :class="[
+            'text-transparent text-shadow-xs',
+            'px-8 py-3 rounded-full font-bold text-lg transition-all duration-300 hover:scale-105 active:scale-95 ',
+          ]"
         >
           {{ running ? 'Pause' : 'Start' }}
         </button>
 
         <button
           @click="reset"
-          class="px-9 py-3 rounded-full font-medium text-lg transition-all duration-300 border-2 text-white border-white"
+          class="px-9 py-3 rounded-full font-medium text-lg border-2 text-white border-white hover:bg-white hover:text-black transition-all duration-300"
         >
           Reset
         </button>
@@ -123,12 +133,14 @@
 <script lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted, defineComponent } from 'vue'
 import { usePomodoroStore } from '@/stores/usePomodoroStore'
+import { usePomoColor } from '@/functions/pomoColor'
 
 export default defineComponent({
   name: 'AppPomodoro',
 
   setup() {
     const store = usePomodoroStore()
+    const { getColorName } = usePomoColor()
 
     const modes = ['pomodoro', 'short', 'long'] as const
     type Mode = (typeof modes)[number]
@@ -142,6 +154,8 @@ export default defineComponent({
     const timer = ref(0)
     const running = ref(false)
     let interval: ReturnType<typeof setInterval> | null = null
+
+    // Computed properties for dynamic styling
 
     const durationInSeconds = computed(() => {
       switch (mode.value) {
@@ -286,6 +300,7 @@ export default defineComponent({
       toggle,
       reset,
       switchMode,
+      getColorName,
     }
   },
 })
@@ -295,15 +310,6 @@ export default defineComponent({
 /* Custom animations for smooth transitions */
 .transition-all {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Ensure consistent button sizing */
-button {
-  transition: transform 0.2s ease;
-}
-
-button:active {
-  transform: scale(0.98);
 }
 
 /* Progress bar animation */
