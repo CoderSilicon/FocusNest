@@ -3,6 +3,7 @@
     <AppNavbar />
     <main class="container mx-auto px-4 py-8">
       <AppPomodoro />
+      <AppTasks />
     </main>
   </div>
 </template>
@@ -11,6 +12,7 @@
 import { computed } from 'vue'
 import AppNavbar from '@/components/App_Navbar.vue'
 import AppPomodoro from '@/components/App_Pomodoro.vue'
+import AppTasks from '@/components/App_Tasks.vue'
 import { usePomoColor } from '@/functions/pomoColor'
 
 const { getHomePageColor } = usePomoColor()

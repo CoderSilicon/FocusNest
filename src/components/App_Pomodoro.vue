@@ -16,7 +16,8 @@
           @click="switchMode(m)"
           class="group relative cursor-pointer px-4 py-2 rounded-lg transition-all duration-300 font-medium text-white"
         >
-          {{ labelMap[m] }}
+          <span class="hidden sm:inline">{{ labelMap[m] }}</span>
+          <span class="sm:hidden">{{ abbreviatedLabels[m] }}</span>
 
           <!-- Active underline -->
           <div
@@ -66,53 +67,15 @@
           <p v-else-if="mode === 'short'">Short Break</p>
           <p v-else>Long Break • You've earned it!</p>
         </div>
-
-        <!-- Active Task Display -->
-        <div
-          v-if="store.settings.enableTasks && store.activeTask"
-          class="mb-6 p-4 rounded-lg border-2"
-          :class="{
-            'bg-gray-50 border-gray-300 text-black': mode === 'pomodoro',
-            'bg-gray-900 border-gray-700 text-white': mode === 'short' || mode === 'long',
-          }"
-        >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="font-medium">{{ store.activeTask.title }}</p>
-              <p
-                class="text-sm"
-                :class="{
-                  'text-gray-600': mode === 'pomodoro',
-                  'text-gray-400': mode === 'short' || mode === 'long',
-                }"
-              >
-                {{ store.activeTask.pomodorosCompleted }}/{{ store.activeTask.estimatedPomodoros }}
-                pomodoros
-              </p>
-            </div>
-            <div class="flex items-center gap-2">
-              <div
-                class="w-12 h-12 rounded-full border-2 flex items-center justify-center font-bold"
-                :class="{
-                  'border-black text-black': mode === 'pomodoro',
-                  'border-white text-white': mode === 'short' || mode === 'long',
-                }"
-              >
-                🍅
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       <!-- Control Buttons -->
       <div class="flex justify-center items-center gap-4">
         <button
           @click="toggle"
-          :class="[
-            'text-transparent text-shadow-xs',
-            'px-8 py-3 rounded-full font-bold text-lg transition-all duration-300 hover:scale-105 active:scale-95 ',
-          ]"
+          @keyup.space="toggle"
+          @keydown.space="toggle"
+          class="px-8 py-3 rounded-full font-semibold text-lg transition-all duration-300 hover:scale-105 active:scale-95 text-transparent bg-slate-100 text-shadow-xs"
         >
           {{ running ? 'Pause' : 'Start' }}
         </button>
@@ -124,8 +87,6 @@
           Reset
         </button>
       </div>
-
-      <!-- Statistics -->
     </div>
   </div>
 </template>
@@ -133,14 +94,12 @@
 <script lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted, defineComponent } from 'vue'
 import { usePomodoroStore } from '@/stores/usePomodoroStore'
-import { usePomoColor } from '@/functions/pomoColor'
 
 export default defineComponent({
   name: 'AppPomodoro',
 
   setup() {
     const store = usePomodoroStore()
-    const { getColorName } = usePomoColor()
 
     const modes = ['pomodoro', 'short', 'long'] as const
     type Mode = (typeof modes)[number]
@@ -148,6 +107,11 @@ export default defineComponent({
       pomodoro: 'Pomodoro',
       short: 'Short Break',
       long: 'Long Break',
+    }
+    const abbreviatedLabels: Record<Mode, string> = {
+      pomodoro: 'Pomo',
+      short: 'Short',
+      long: 'Long',
     }
 
     const mode = ref<Mode>('pomodoro')
@@ -292,6 +256,7 @@ export default defineComponent({
       store,
       modes,
       labelMap,
+      abbreviatedLabels,
       mode,
       timer,
       running,
@@ -300,7 +265,6 @@ export default defineComponent({
       toggle,
       reset,
       switchMode,
-      getColorName,
     }
   },
 })

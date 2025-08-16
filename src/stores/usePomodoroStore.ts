@@ -1,42 +1,6 @@
 // stores/usePomodoroStore.ts
 import { defineStore } from 'pinia'
-
-interface PomodoroSettings {
-  pomodoroDuration: number
-  shortBreakDuration: number
-  longBreakDuration: number
-  longBreakInterval: number
-  enableTasks: boolean
-  autoStartBreaks: boolean
-  autoStartPomodoros: boolean
-  notifications: boolean
-}
-
-interface Task {
-  id: string
-  title: string
-  completed: boolean
-  pomodorosCompleted: number
-  estimatedPomodoros: number
-  createdAt: Date
-}
-
-interface PomodoroSession {
-  id: string
-  type: 'pomodoro' | 'short' | 'long'
-  duration: number
-  completedAt: Date
-  taskId?: string
-}
-
-// Define the saved data structure for localStorage (serialized format)
-interface SavedData {
-  settings?: Partial<PomodoroSettings>
-  tasks?: Array<Omit<Task, 'createdAt'> & { createdAt: string }>
-  completedSessions?: Array<Omit<PomodoroSession, 'completedAt'> & { completedAt: string }>
-  pomodoroCount?: number
-  activeTaskId?: string | null
-}
+import type { PomodoroSettings, PomodoroSession, SavedData } from './interface'
 
 export const usePomodoroStore = defineStore('pomodoro', {
   state: () => ({
@@ -50,17 +14,12 @@ export const usePomodoroStore = defineStore('pomodoro', {
       autoStartBreaks: false,
       autoStartPomodoros: false,
       notifications: true,
-      soundEffects: true,
     } as PomodoroSettings,
 
     // Session tracking
     currentSession: null as PomodoroSession | null,
     completedSessions: [] as PomodoroSession[],
     pomodoroCount: 0,
-
-    // Tasks
-    tasks: [] as Task[],
-    activeTaskId: null as string | null,
 
     // Timer state
     isRunning: false,
@@ -91,14 +50,6 @@ export const usePomodoroStore = defineStore('pomodoro', {
     isLongBreakTime: (state) => {
       return state.pomodoroCount > 0 && state.pomodoroCount % state.settings.longBreakInterval === 0
     },
-
-    // Active task
-    activeTask: (state) => {
-      return state.tasks.find((task) => task.id === state.activeTaskId) || null
-    },
-
-    // Completed tasks
-    completedTasks: (state) => state.tasks.filter((task) => task.completed),
 
     // Today's completed pomodoros
     todayCompletedPomodoros: (state) => {
@@ -135,14 +86,6 @@ export const usePomodoroStore = defineStore('pomodoro', {
       this.saveToLocalStorage()
     },
 
-    randomizeSettings() {
-      this.settings.pomodoroDuration = Math.floor(Math.random() * 35) + 15 // 15-50 min
-      this.settings.shortBreakDuration = Math.floor(Math.random() * 10) + 3 // 3-12 min
-      this.settings.longBreakDuration = Math.floor(Math.random() * 25) + 15 // 15-40 min
-      this.settings.longBreakInterval = Math.floor(Math.random() * 6) + 3 // 3-8 cycles
-      this.saveToLocalStorage()
-    },
-
     // Timer actions
     setMode(mode: 'pomodoro' | 'short' | 'long') {
       this.currentMode = mode
@@ -156,17 +99,11 @@ export const usePomodoroStore = defineStore('pomodoro', {
         type: this.currentMode,
         duration: this.currentDuration,
         completedAt: new Date(),
-        taskId: this.activeTaskId || undefined,
       }
     },
 
     pauseTimer() {
       this.isRunning = false
-    },
-
-    stopTimer() {
-      this.isRunning = false
-      this.currentSession = null
     },
 
     resetTimer() {
@@ -187,14 +124,6 @@ export const usePomodoroStore = defineStore('pomodoro', {
       // Handle pomodoro completion
       if (this.currentMode === 'pomodoro') {
         this.pomodoroCount++
-
-        // Update active task
-        if (this.activeTaskId) {
-          const task = this.tasks.find((t) => t.id === this.activeTaskId)
-          if (task) {
-            task.pomodorosCompleted++
-          }
-        }
 
         // Auto-switch to break
         if (this.settings.autoStartBreaks) {
@@ -222,38 +151,9 @@ export const usePomodoroStore = defineStore('pomodoro', {
     },
 
     // Task management actions
-    addTask(title: string, estimatedPomodoros: number = 1): Task {
-      const newTask: Task = {
-        id: Date.now().toString(),
-        title,
-        completed: false,
-        pomodorosCompleted: 0,
-        estimatedPomodoros,
-        createdAt: new Date(),
-      }
-      this.tasks.push(newTask)
-      this.saveToLocalStorage()
-      return newTask
-    },
 
-    updateTask(taskId: string, updates: Partial<Omit<Task, 'id' | 'createdAt'>>) {
-      const taskIndex = this.tasks.findIndex((task) => task.id === taskId)
-      if (taskIndex !== -1) {
-        this.tasks[taskIndex] = { ...this.tasks[taskIndex], ...updates }
-        this.saveToLocalStorage()
-      }
-    },
-
-    deleteTask(taskId: string) {
-      this.tasks = this.tasks.filter((task) => task.id !== taskId)
-      if (this.activeTaskId === taskId) {
-        this.activeTaskId = null
-      }
-      this.saveToLocalStorage()
-    },
-
-    setActiveTask(taskId: string | null) {
-      this.activeTaskId = taskId
+    toggleTask() {
+      this.settings.enableTasks = !this.settings.enableTasks
       this.saveToLocalStorage()
     },
 
@@ -266,7 +166,7 @@ export const usePomodoroStore = defineStore('pomodoro', {
       const body =
         this.currentMode === 'pomodoro'
           ? 'Time for a break! Great work! 🍅'
-          : "Break's over. Ready for another pomodoro? 💪"
+          : "Break's over. Ready for another pomodoro? 😊"
 
       if (Notification.permission === 'granted') {
         new Notification(title, { body, icon: '/favicon.ico' })
@@ -283,16 +183,11 @@ export const usePomodoroStore = defineStore('pomodoro', {
     saveToLocalStorage() {
       const data: SavedData = {
         settings: this.settings,
-        tasks: this.tasks.map((task) => ({
-          ...task,
-          createdAt: task.createdAt.toISOString(),
-        })),
         completedSessions: this.completedSessions.map((session) => ({
           ...session,
           completedAt: session.completedAt.toISOString(),
         })),
         pomodoroCount: this.pomodoroCount,
-        activeTaskId: this.activeTaskId,
       }
       try {
         localStorage.setItem('focusnest-data', JSON.stringify(data))
@@ -312,14 +207,6 @@ export const usePomodoroStore = defineStore('pomodoro', {
           this.settings = { ...this.settings, ...data.settings }
         }
 
-        if (data.tasks) {
-          // Ensure dates are properly converted
-          this.tasks = data.tasks.map((task) => ({
-            ...task,
-            createdAt: new Date(task.createdAt),
-          }))
-        }
-
         if (data.completedSessions) {
           this.completedSessions = data.completedSessions.map((session) => ({
             ...session,
@@ -330,27 +217,11 @@ export const usePomodoroStore = defineStore('pomodoro', {
         if (typeof data.pomodoroCount === 'number') {
           this.pomodoroCount = data.pomodoroCount
         }
-
-        if (data.activeTaskId !== undefined) {
-          this.activeTaskId = data.activeTaskId
-        }
       } catch (error) {
         console.error('Error loading saved data:', error)
         // Optionally clear corrupted data
         localStorage.removeItem('focusnest-data')
       }
-    },
-
-    // Reset all data
-    resetAllData() {
-      this.tasks = []
-      this.completedSessions = []
-      this.pomodoroCount = 0
-      this.activeTaskId = null
-      this.currentSession = null
-      this.isRunning = false
-      this.resetSettingsToDefaults()
-      localStorage.removeItem('focusnest-data')
     },
   },
 })
