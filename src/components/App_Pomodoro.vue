@@ -10,25 +10,35 @@
     <!-- Decorative shapes -->
     <div v-if="mode === 'short'" class="absolute inset-0 pointer-events-none">
       <!-- soft circles -->
-      <div class="absolute top-10 left-12 w-28 h-28 rounded-full bg-white/20 blur-2xl"></div>
-      <div class="absolute bottom-16 right-20 w-36 h-36 rounded-full bg-white/20 blur-3xl"></div>
+      <div
+        class="absolute top-8 left-6 w-20 h-20 sm:w-28 sm:h-28 rounded-full bg-white/20 blur-xl sm:blur-2xl"
+      ></div>
+      <div
+        class="absolute bottom-10 right-8 w-24 h-24 sm:w-36 sm:h-36 rounded-full bg-white/20 blur-2xl sm:blur-3xl"
+      ></div>
 
       <!-- dotted pattern -->
-      <div class="absolute top-1/3 left-1/4 grid grid-cols-3 gap-2 opacity-10">
-        <div v-for="i in 9" :key="i" class="w-2 h-2 rounded-full bg-white"></div>
+      <div class="absolute top-1/3 left-1/4 grid grid-cols-3 gap-1 sm:gap-2 opacity-10">
+        <div v-for="i in 9" :key="i" class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white"></div>
       </div>
     </div>
 
     <div v-else-if="mode === 'long'" class="absolute inset-0 pointer-events-none">
       <!-- horizon line -->
-      <div class="absolute bottom-1/4 left-0 w-full h-0.5 bg-white/40"></div>
+      <div class="absolute bottom-1/4 left-0 w-full h-0.5 bg-white/30 sm:bg-white/40"></div>
 
       <!-- arc (sunrise feel) -->
-      <div class="absolute bottom-1/4 left-1/4 w-20 h-10 rounded-t-full bg-white/50"></div>
+      <div
+        class="absolute bottom-1/4 left-1/4 w-14 h-8 sm:w-20 sm:h-10 rounded-t-full bg-white/40 sm:bg-white/50"
+      ></div>
 
       <!-- layered translucent bars -->
-      <div class="absolute top-1/4 right-0 w-1/3 rounded-l-full h-1 bg-white/50"></div>
-      <div class="absolute top-1/3 right-0 w-1/4 rounded-l-full h-1 bg-white/50"></div>
+      <div
+        class="absolute top-1/4 right-0 w-1/2 sm:w-1/3 rounded-l-full h-0.5 sm:h-1 bg-white/40 sm:bg-white/50"
+      ></div>
+      <div
+        class="absolute top-1/3 right-0 w-1/3 sm:w-1/4 rounded-l-full h-0.5 sm:h-1 bg-white/40 sm:bg-white/50"
+      ></div>
     </div>
 
     <!-- Mode Navigation -->
@@ -62,7 +72,7 @@
     <div class="p-4">
       <div class="text-center mb-8">
         <h1
-          class="transition-opacity duration-700 ease-in-out text-8xl md:text-9xl font-bold mb-4 font-mono tracking-tight text-white"
+          class="transition-opacity duration-700 ease-in-out text-6xl md:text-9xl font-bold mb-4 font-mono tracking-tight text-white"
         >
           {{ formattedTime }}
         </h1>
