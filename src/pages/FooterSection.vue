@@ -12,7 +12,7 @@
       <!-- Creator & Copyright -->
       <div class="text-center md:text-right text-sm text-gray-500 space-y-1">
         <p>Crafted with ❤️ by <span class="font-medium text-gray-700">CoderSilicon</span></p>
-        <p class="text-xs">© {{ new Date().getFullYear() }} FocusNest. All rights reserved.</p>
+        <p class="text-xs">© {{ new Date().getFullYear() }} Fleuris. All rights reserved.</p>
       </div>
     </div>
   </footer>
