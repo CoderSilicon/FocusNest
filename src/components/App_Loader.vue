@@ -25,7 +25,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { usePomoColor } from '@/functions/pomoColor'
-import logo from '../assets/logo.svg'
+import logo from '@/assets/logo.svg'
 
 const { getHomePageColor } = usePomoColor()
 const homePageColor = computed(() => getHomePageColor())

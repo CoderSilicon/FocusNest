@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import logo from '../assets/logo.svg'
+import logo from '@/assets/logo.svg'
 // No script logic needed for this static footer component
 </script>
 
