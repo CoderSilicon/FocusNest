@@ -5,7 +5,6 @@
     <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
       <!-- Logo + Name -->
       <div class="flex items-center gap-4">
-        <img src="../assets/logo.svg" alt="App Logo" class="w-12 h-12 invert" />
         <span class="text-2xl md:text-3xl font-semibold tracking-wide">Fleuris</span>
       </div>
 
