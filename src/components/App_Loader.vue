@@ -6,7 +6,7 @@
   >
     <!-- Logo -->
     <div class="flex items-center justify-center mb-12">
-      <img src="../assets/logo.svg" alt="Logo" class="w-32 h-32 animate-logo" />
+      <img :src="logo" alt="Logo" class="w-32 h-32 animate-logo" />
     </div>
 
     <!-- Loading bar with percentage -->
@@ -25,6 +25,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { usePomoColor } from '@/functions/pomoColor'
+import logo from '../assets/logo.svg'
 
 const { getHomePageColor } = usePomoColor()
 const homePageColor = computed(() => getHomePageColor())
