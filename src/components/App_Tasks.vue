@@ -7,8 +7,45 @@
     <div id="TASK_HEADER" class="relative">
       <div class="flex justify-between items-center">
         <h1 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 lexend text-white">Tasks</h1>
-        <button class="text-white text-2xl sm:text-3xl font-bold" aria-label="Add Task">
-          <LucideMenu />
+        <button
+          class="text-md sm:text-xs font-light relative"
+          @click="toggleTaskMenu"
+          aria-label="Add Task"
+        >
+          <LucideMenu class="text-white hover:text-gray-400" />
+
+          <div
+            v-if="isTaskMenuOpen"
+            class="absolute right-0 top-12 bg-slate-50 w-72 text-slate-700 text-base flex flex-col items-start justify-center gap-2 p-4 rounded-2xl lexend shadow-md"
+          >
+            <li
+              @click="finishAllTasks"
+              class="flex items-center gap-2 px-2 py-1 hover:bg-slate-200 rounded-lg w-full transition"
+            >
+              <LucideCheckCircle class="text-slate-500" /> Finish All Tasks
+            </li>
+
+            <li
+              @click="unfinishAllTasks"
+              class="flex items-center gap-2 px-2 py-1 hover:bg-slate-200 rounded-lg w-full transition"
+            >
+              <LucideRotateCcw class="text-slate-500" /> Unfinish All Tasks
+            </li>
+
+            <li
+              @click="resetTasks"
+              class="flex items-center gap-2 px-2 py-1 hover:bg-slate-200 rounded-lg w-full transition"
+            >
+              <LucideCheckSquare class="text-slate-500" /> Clear Finished Tasks
+            </li>
+
+            <li
+              @click="clearFinishedTasks"
+              class="flex items-center gap-2 px-2 py-1 hover:bg-slate-200 rounded-lg w-full transition"
+            >
+              <LucideTrash2 class="text-slate-500" /> Clear All Tasks
+            </li>
+          </div>
         </button>
       </div>
       <div class="mb-4 sm:mb-6 rounded-full border border-slate-200" />
@@ -121,17 +158,27 @@
 </template>
 
 <script lang="ts">
-import { LucideMenu, LucideTrash2 } from 'lucide-vue-next'
+import {
+  LucideMenu,
+  LucideTrash2,
+  LucideCheckSquare,
+  LucideRotateCcw,
+  LucideCheckCircle,
+} from 'lucide-vue-next'
 import { ref } from 'vue'
 import { usePomodoroStore } from '@/stores/usePomodoroStore'
 
 const isAddMenu = ref(false)
+const isTaskMenuOpen = ref(false)
 
 export default {
   name: 'AppTasks',
   components: {
     LucideTrash2,
     LucideMenu,
+    LucideCheckSquare,
+    LucideRotateCcw,
+    LucideCheckCircle,
   },
 
   setup() {
@@ -139,6 +186,7 @@ export default {
 
     return {
       isAddMenu,
+      isTaskMenuOpen,
       store,
     }
   },
@@ -189,6 +237,25 @@ export default {
     toggleAddMenu() {
       isAddMenu.value = !isAddMenu.value
     },
+    toggleTaskMenu() {
+      isTaskMenuOpen.value = !isTaskMenuOpen.value
+    },
+    resetTasks() {
+      this.tasks = []
+      localStorage.removeItem('tasks')
+    },
+    clearFinishedTasks() {
+      this.tasks = this.tasks.filter((task) => task.done === true)
+      localStorage.setItem('tasks', JSON.stringify(this.tasks))
+    },
+    finishAllTasks() {
+      this.tasks.forEach((task) => (task.done = true))
+      localStorage.setItem('tasks', JSON.stringify(this.tasks))
+    },
+    unfinishAllTasks() {
+      this.tasks.forEach((task) => (task.done = false))
+      localStorage.setItem('tasks', JSON.stringify(this.tasks))
+    },
   },
 }
 </script>
@@ -196,6 +263,7 @@ export default {
 <style>
 .scrollbar-thin {
   scrollbar-width: thin;
-  scrollbar-color: #6b7280 transparent;
+  scroll-behavior: smooth;
+  scrollbar-color: #0000004b transparent;
 }
 </style>

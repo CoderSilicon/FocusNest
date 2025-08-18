@@ -1,12 +1,36 @@
 <template>
   <div
-    class="lexend rounded-4xl mx-auto p-9 transition-all duration-500 select-none max-w-4xl backdrop-blur-3xl shadow-lg"
+    class="lexend rounded-4xl mx-auto p-9 transition-all duration-500 select-none max-w-4xl backdrop-blur-3xl bg-opacity-80"
     :class="{
-      'bg-zinc-300/50': mode === 'pomodoro',
-      'bg-zinc-400/50': mode === 'short',
-      'bg-zinc-600/50': mode === 'long',
+      [ComputedColor + ' bg-opacity-85 border-2 border-white shadow-xl']: mode === 'pomodoro',
+      [ComputedColor + ' bg-opacity-75 border-2 border-white/40 shadow-lg']: mode === 'short',
+      [ComputedColor + ' border-2 border-slate-100/30  shadow-md']: mode === 'long',
     }"
   >
+    <!-- Decorative shapes -->
+    <div v-if="mode === 'short'" class="absolute inset-0 pointer-events-none">
+      <!-- soft circles -->
+      <div class="absolute top-10 left-12 w-28 h-28 rounded-full bg-white/20 blur-2xl"></div>
+      <div class="absolute bottom-16 right-20 w-36 h-36 rounded-full bg-white/20 blur-3xl"></div>
+
+      <!-- dotted pattern -->
+      <div class="absolute top-1/3 left-1/4 grid grid-cols-3 gap-2 opacity-10">
+        <div v-for="i in 9" :key="i" class="w-2 h-2 rounded-full bg-white"></div>
+      </div>
+    </div>
+
+    <div v-else-if="mode === 'long'" class="absolute inset-0 pointer-events-none">
+      <!-- horizon line -->
+      <div class="absolute bottom-1/4 left-0 w-full h-0.5 bg-white/40"></div>
+
+      <!-- arc (sunrise feel) -->
+      <div class="absolute bottom-1/4 left-1/4 w-20 h-10 rounded-t-full bg-white/50"></div>
+
+      <!-- layered translucent bars -->
+      <div class="absolute top-1/4 right-0 w-1/3 rounded-l-full h-1 bg-white/50"></div>
+      <div class="absolute top-1/3 right-0 w-1/4 rounded-l-full h-1 bg-white/50"></div>
+    </div>
+
     <!-- Mode Navigation -->
     <nav id="NAVITEMS" class="flex justify-around items-center mb-8">
       <ul class="flex space-x-6 list-none text-lg lexend relative">
@@ -37,20 +61,15 @@
     <!-- Timer Display -->
     <div class="p-4">
       <div class="text-center mb-8">
-        <h1 class="text-8xl md:text-9xl font-bold mb-4 font-mono tracking-tight text-white">
+        <h1
+          class="transition-opacity duration-700 ease-in-out text-8xl md:text-9xl font-bold mb-4 font-mono tracking-tight text-white"
+        >
           {{ formattedTime }}
         </h1>
 
         <!-- Progress Bar -->
         <div class="w-full max-w-md mx-auto mb-6">
-          <div
-            class="w-full h-2 rounded-full overflow-hidden"
-            :class="{
-              'bg-zinc-300/50': mode === 'pomodoro',
-              'bg-zinc-400/50': mode === 'short',
-              'bg-zinc-600/50': mode === 'long',
-            }"
-          >
+          <div class="w-full h-2 rounded-full overflow-hidden bg-zinc-300/50">
             <div
               class="h-full rounded-full transition-all duration-1000 ease-linear bg-slate-100"
               :style="{ width: progressPercentage + '%' }"
@@ -60,8 +79,8 @@
 
         <!-- Session Info -->
         <div class="text-lg font-medium mb-6 text-slate-100">
-          <p v-if="mode === 'pomodoro'">
-            Pomodoro #{{ store.pomodoroCount + 1 }}
+          <p v-if="mode === 'pomodoro'" class="text-xl lexend">
+            #{{ store.pomodoroCount + 1 }}
             <span v-if="store.isLongBreakTime"> • Long break next!</span>
           </p>
           <p v-else-if="mode === 'short'">Short Break</p>
@@ -75,7 +94,8 @@
           @click="toggle"
           @keyup.space="toggle"
           @keydown.space="toggle"
-          class="px-8 py-3 rounded-full font-semibold text-lg transition-all duration-300 hover:scale-105 active:scale-95 text-transparent bg-slate-100 text-shadow-xs"
+          :class="[ComputedColor]"
+          class="px-8 py-3 rounded-full font-semibold text-lg transition-all duration-300 hover:scale-105 active:scale-95 text-white"
         >
           {{ running ? 'Pause' : 'Start' }}
         </button>
@@ -94,12 +114,15 @@
 <script lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted, defineComponent } from 'vue'
 import { usePomodoroStore } from '@/stores/usePomodoroStore'
+import { usePomoColor } from '@/functions/pomoColor'
 
 export default defineComponent({
   name: 'AppPomodoro',
 
   setup() {
     const store = usePomodoroStore()
+    const { getHomePageColor } = usePomoColor()
+    const ComputedColor = computed(() => getHomePageColor())
 
     const modes = ['pomodoro', 'short', 'long'] as const
     type Mode = (typeof modes)[number]
@@ -265,6 +288,7 @@ export default defineComponent({
       toggle,
       reset,
       switchMode,
+      ComputedColor,
     }
   },
 })

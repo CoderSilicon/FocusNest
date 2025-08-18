@@ -4,7 +4,12 @@
     <nav
       class="flex items-center justify-between sm:justify-around gap-2 sm:gap-4 p-3 sm:p-5 text-white lexend"
     >
-      <h1 class="font-bold text-2xl lg:text-3xl tracking-tight">FocusNest</h1>
+      <div class="flex justify-center items-center gap-1">
+        <img src="../assets/Logo.svg" alt="Fleuris Logo" class="w-8 h-8 sm:w-10 sm:h-10" />
+        <h1 class="font-bold text-2xl lg:text-3xl tracking-tight josefin-sans hidden sm:inline">
+          Fleuris
+        </h1>
+      </div>
       <ul class="flex gap-1 sm:gap-2 space-x-2 sm:space-x-4 text-sm sm:text-lg lg:text-xl">
         <!-- Settings Trigger -->
         <li
