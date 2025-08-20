@@ -1,6 +1,6 @@
 <template>
   <div
-    class= " relative lexend rounded-4xl mx-auto p-9 transition-all duration-500 select-none max-w-4xl backdrop-blur-3xl bg-opacity-80"
+    class="lexend rounded-4xl mx-auto p-9 transition-all duration-500 select-none max-w-4xl backdrop-blur-3xl bg-opacity-80"
     :class="{
       [ComputedColor + ' bg-opacity-85 border-2 border-white shadow-xl']: mode === 'pomodoro',
       [ComputedColor + ' bg-opacity-75 border-2 border-white/40 shadow-lg']: mode === 'short',
